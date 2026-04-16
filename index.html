@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-LKPD Transformasi Geometri - Rotasi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --secondary: #f093fb;
+            --light-bg: #f8f9ff;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding: 1rem;
+        }
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .app-header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .app-header p { font-size: 1rem; opacity: 0.95; }
+        .progress-bar { margin-top: 2rem; height: 6px; background: rgba(255,255,255,0.3); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s ease; }
+        .app-main { padding: 2rem; }
+        .nav-tabs { display: flex; gap: 0.75rem; margin-bottom: 2rem; overflow-x: auto; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light); }
+        .tab-btn { padding: 0.75rem 1.5rem; border: 2px solid var(--border-light); background: var(--light-bg); border-radius: 12px; cursor: pointer; font-size: 0.95rem; font-weight: 600; white-space: nowrap; transition: all 0.3s ease; color: var(--text-muted); }
+        .tab-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-color: var(--primary-dark); color: var(--white); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3); }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { margin-bottom: 2.5rem; }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light); }
+        .section-header h2 { font-size: 1.8rem; color: var(--text-dark); }
+        .section-subtitle { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
+        .section-info { background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 100%); border-left: 4px solid var(--primary); padding: 1.25rem; border-radius: 10px; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-dark); }
+        label .required { color: #ef4444; }
+        input[type="text"], textarea, select { width: 100%; padding: 0.875rem 1rem; border: 2px solid var(--border-light); border-radius: 10px; font-family: inherit; font-size: 1rem; background: var(--light-bg); }
+        input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        textarea { resize: vertical; min-height: 100px; }
+        .checkbox-group { display: flex; gap: 2rem; margin-top: 0.75rem; flex-wrap: wrap; }
+        .checkbox-group label { display: flex; align-items: center; gap: 0.6rem; margin: 0; font-weight: 500; cursor: pointer; }
+        .checkbox-group input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+        table th { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 1rem; text-align: left; font-weight: 600; }
+        table td { padding: 1rem; border-bottom: 1px solid var(--border-light); background: var(--white); }
+        table input { width: 100%; padding: 0.5rem; border: 1px solid var(--border-light); border-radius: 6px; }
+        .applet-container { background: var(--light-bg); border-radius: 15px; padding: 1.5rem; margin: 1.5rem 0; border: 2px dashed var(--primary); min-height: 400px; }
+        .applet-container iframe { width: 100%; height: 600px; border: none; border-radius: 10px; }
+        .button-group { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; border-top: 2px solid var(--border-light); padding-top: 2rem; }
+        button { padding: 0.875rem 1.75rem; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3); }
+        .btn-secondary { background: var(--light-bg); color: var(--primary); border: 2px solid var(--primary); }
+        .btn-secondary:hover { background: var(--primary); color: var(--white); }
+        .alert { padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 500; display: flex; align-items: center; gap: 0.75rem; }
+        .alert-success { background: #d1fae5; color: #065f46; border-left: 4px solid #4ade80; }
+        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+        .save-status { font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem; }
+        .save-status.saved { color: #4ade80; }
+        .highlight-box { background: linear-gradient(135deg, #fffbea 0%, #fef3c7 100%); border-left: 4px solid #fbbf24; padding: 1.25rem; border-radius: 10px; margin: 1.5rem 0; }
+        @media (max-width: 768px) {
+            .app-main { padding: 1rem; }
+            .app-header h1 { font-size: 1.8rem; }
+            button { width: 100%; }
+            .applet-container iframe { height: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <h1>📋 e-LKPD Transformasi Geometri</h1>
+            <p>Rotasi (Perputaran) | Model KKDV | Digital Interactive</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="app-main">
+            <div id="alertContainer"></div>
+            <div class="nav-tabs" id="navTabs"></div>
+            <div id="tabsContainer"></div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="submitForm()">✓ DOWNLOAD JAWABAN</button>
+                <button class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+            </div>
+
+            <div class="save-status" id="saveStatus">⏱ Auto-save aktif...</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script>
+        const TABS = [
+            { id: 'info', label: '👤 Info Siswa' },
+            { id: 'k1', label: '🎯 K1' },
+            { id: 'k2', label: '🖥️ K2' },
+            { id: 'k3', label: '🔍 K3' },
+            { id: 'k4', label: '🔭 K4' },
+            { id: 'k5', label: '📊 K5' },
+            { id: 'refleksi', label: '✨ Refleksi' }
+        ];
+
+        function initTabs() {
+            const navContainer = document.getElementById('navTabs');
+            const tabsContainer = document.getElementById('tabsContainer');
+
+            TABS.forEach((tab, index) => {
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+                btn.innerHTML = tab.label;
+                btn.onclick = (e) => switchTab(tab.id, e);
+                navContainer.appendChild(btn);
+
+                const content = document.createElement('div');
+                content.id = `tab-${tab.id}`;
+                content.className = `tab-content ${index === 0 ? 'active' : ''}`;
+                content.innerHTML = getContent(tab.id);
+                tabsContainer.appendChild(content);
+            });
+        }
+
+        function switchTab(id, e) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${id}`).classList.add('active');
+            e.target.classList.add('active');
+            updateProgress();
+        }
+
+        function getContent(id) {
+            const contents = {
+                'info': `<div class="section"><div class="section-header"><div style="font-size:2rem;">👤</div><div><h2>Identitas Peserta Didik</h2></div></div><div class="form-group"><label>Nama Siswa <span class="required">*</span></label><input type="text" id="nama_siswa" required></div><div class="form-group"><label>Kelas <span class="required">*</span></label><input type="text" id="kelas" required></div><div class="form-group"><label>Kelompok</label><input type="text" id="kelompok"></div><div class="form-group"><label>Tanggal</label><input type="text" id="tanggal"></div></div>`,
+                
+                'k1': `<div class="section"><div class="section-header"><div style="font-size:2rem;">🎯</div><div><h2>Kegiatan 1: Prediksi</h2><p class="section-subtitle">±15 Menit</p></div></div><div class="section-info">Prediksikan posisi bayangan bangun setelah diputar 180° terhadap titik O</div><h3 style="color:var(--primary);margin:1rem 0;">BAGIAN A: PREDIKSI INDIVIDU</h3><div class="form-group"><label>1.1 Gambar Prediksi</label><textarea id="k1_gambar_individu"></textarea></div><div class="form-group"><label>1.2 Alasan</label><textarea id="k1_alasan_individu"></textarea></div><h3 style="color:var(--primary);margin:1rem 0;">BAGIAN B: DISKUSI KELOMPOK</h3><div class="form-group"><label>1.3 Prediksi sama?</label><div class="checkbox-group"><label><input type="checkbox" name="k1_sama"> Ya</label><label><input type="checkbox" name="k1_berbeda"> Tidak</label></div></div><div class="form-group"><label>1.4 Hasil Prediksi Kelompok</label><textarea id="k1_gambar_kelompok"></textarea></div><div class="form-group"><label>1.5 Alasan Kelompok</label><textarea id="k1_alasan_kelompok"></textarea></div></div>`,
+
+                'k2': `<div class="section"><div class="section-header"><div style="font-size:2rem;">🖥️</div><div><h2>Kegiatan 2: Konfrontasi Visual</h2><p class="section-subtitle">±15 Menit dengan GeoGebra</p></div></div><div class="applet-container"><iframe src="kegiatan2_rotasi_180.html"></iframe></div><h3 style="color:var(--primary);margin:1rem 0;">Tabel Pengamatan</h3><table><tr><th>Aspek</th><th>Prediksi Saya</th><th>Prediksi Kelompok</th><th>Hasil GEO</th></tr><tr><td>Letak</td><td><input type="text" id="k2_letak_saya"></td><td><input type="text" id="k2_letak_kelompok"></td><td><input type="text" id="k2_letak_geo"></td></tr><tr><td>Bentuk</td><td><input type="text" id="k2_bentuk_saya"></td><td><input type="text" id="k2_bentuk_kelompok"></td><td><input type="text" id="k2_bentuk_geo"></td></tr><tr><td>Ukuran</td><td><input type="text" id="k2_ukuran_saya"></td><td><input type="text" id="k2_ukuran_kelompok"></td><td><input type="text" id="k2_ukuran_geo"></td></tr></table><div class="form-group"><label>Kesesuaian Prediksi Saya</label><div class="checkbox-group"><label><input type="checkbox" name="k2_saya"> Sesuai</label><label><input type="checkbox" name="k2_saya2"> Sebagian</label><label><input type="checkbox" name="k2_saya3"> Tidak</label></div></div><div class="form-group"><label>Penjelasan</label><textarea id="k2_penjelasan_saya"></textarea></div></div>`,
+
+                'k3': `<div class="section"><div class="section-header"><div style="font-size:2rem;">🔍</div><div><h2>Kegiatan 3: Analisis</h2></div></div><div class="form-group"><label>3.1 Peran titik O</label><textarea id="k3_peran_o"></textarea></div><div class="form-group"><label>3.2 Bagian yang keliru</label><textarea id="k3_bagian_keliru"></textarea></div><div class="form-group"><label>3.3 Apa yang berubah?</label><textarea id="k3_yang_berubah"></textarea></div><div class="form-group"><label>3.4 Apa yang tetap?</label><textarea id="k3_yang_tetap"></textarea></div><div class="highlight-box"><h3 style="color:#92400e;">Kesimpulan K3</h3><textarea id="k3_kesimpulan"></textarea></div></div>`,
+
+                'k4': `<div class="section"><div class="section-header"><div style="font-size:2rem;">🔭</div><div><h2>Kegiatan 4: Eksplorasi</h2><p class="section-subtitle">±20 Menit dengan 4 Bangun</p></div></div><div class="applet-container"><iframe src="kegiatan4_eksplorasi_rotasi.html"></iframe></div><h3 style="color:var(--primary);margin:1rem 0;">Tabel Eksplorasi</h3><table style="font-size:0.9rem;"><tr><th>No</th><th>Bangun</th><th>Bentuk</th><th>Ukuran</th><th>Sisi</th><th>Sudut</th><th>Jarak</th></tr><tr><td>1</td><td>Segitiga</td><td><input id="k4_seg_bentuk"></td><td><input id="k4_seg_ukuran"></td><td><input id="k4_seg_sisi"></td><td><input id="k4_seg_sudut"></td><td><input id="k4_seg_jarak"></td></tr><tr><td>2</td><td>PP</td><td><input id="k4_pp_bentuk"></td><td><input id="k4_pp_ukuran"></td><td><input id="k4_pp_sisi"></td><td><input id="k4_pp_sudut"></td><td><input id="k4_pp_jarak"></td></tr><tr><td>3</td><td>Trapesium</td><td><input id="k4_trap_bentuk"></td><td><input id="k4_trap_ukuran"></td><td><input id="k4_trap_sisi"></td><td><input id="k4_trap_sudut"></td><td><input id="k4_trap_jarak"></td></tr><tr><td>4</td><td>Lay-lay</td><td><input id="k4_lay_bentuk"></td><td><input id="k4_lay_ukuran"></td><td><input id="k4_lay_sisi"></td><td><input id="k4_lay_sudut"></td><td><input id="k4_lay_jarak"></td></tr></table><div class="form-group"><label>4.2 Kesamaan Pola</label><textarea id="k4_pola"></textarea></div><div class="form-group"><label>4.3 Temuan Kelompok</label><textarea id="k4_temuan"></textarea></div></div>`,
+
+                'k5': `<div class="section"><div class="section-header"><div style="font-size:2rem;">📊</div><div><h2>Kegiatan 5: Generalisasi</h2></div></div><div class="form-group"><label>5.1 Definisi Rotasi</label><textarea id="k5_konsep"></textarea></div><h3 style="color:var(--primary);margin:1rem 0;">Sifat Umum</h3><div class="form-group"><label>a. Bangun berpindah dengan cara:</label><input id="k5_cara"></div><div class="form-group"><label>b. Yang tetap adalah:</label><input id="k5_tetap"></div><div class="form-group"><label>c. Yang berubah adalah:</label><input id="k5_berubah"></div><div class="form-group"><label>Sebelum pembelajaran:</label><textarea id="k5_sebelum"></textarea></div><div class="form-group"><label>Setelah pembelajaran:</label><textarea id="k5_sesudah"></textarea></div></div>`,
+
+                'refleksi': `<div class="section"><div class="section-header"><div style="font-size:2rem;">✨</div><div><h2>Refleksi Pembelajaran</h2></div></div><div class="form-group"><label>1. Konsep baru tentang rotasi</label><textarea id="ref_konsep"></textarea></div><div class="form-group"><label>2. Kesalahan konsep yang ditemukan</label><textarea id="ref_kesalahan"></textarea></div><div class="form-group"><label>3. Peran GeoGebra</label><textarea id="ref_geogebra"></textarea></div><div class="form-group"><label>4. Ingin pelajari lebih lanjut</label><textarea id="ref_lanjutan"></textarea></div></div>`
+            };
+            return contents[id] || '';
+        }
+
+        function autoSave() {
+            const data = {};
+            document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+                data[el.id] = el.value;
+            });
+            localStorage.setItem('lkpd_data', JSON.stringify(data));
+            document.getElementById('saveStatus').textContent = '✓ Disimpan';
+            document.getElementById('saveStatus').classList.add('saved');
+        }
+
+        function loadAutoSave() {
+            const data = JSON.parse(localStorage.getItem('lkpd_data') || '{}');
+            Object.keys(data).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = data[key];
+            });
+        }
+
+        function updateProgress() {
+            const total = document.querySelectorAll('input[id], textarea[id]').length;
+            const filled = document.querySelectorAll('input[id]:not([value=""]), textarea[id]:not([value=""])').length;
+            const percent = (filled / total) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        function submitForm() {
+            const nama = document.getElementById('nama_siswa').value.trim();
+            const kelas = document.getElementById('kelas').value.trim();
+
+            if (!nama || !kelas) {
+                showAlert('❌ Nama dan Kelas wajib diisi!', 'error');
+                return;
+            }
+
+            const data = { Timestamp: new Date().toLocaleString('id-ID'), Nama: nama, Kelas: kelas };
+            document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+                data[el.id] = el.value;
+            });
+
+            const ws = XLSX.utils.json_to_sheet([data]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Jawaban');
+            XLSX.writeFile(wb, `LKPD_${nama}_${new Date().toISOString().slice(0,10)}.xlsx`);
+
+            showAlert('✅ Jawaban didownload! Terima kasih!', 'success');
+        }
+
+        function showAlert(msg, type) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = msg;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function resetForm() {
+            if (confirm('Reset semua data?')) {
+                localStorage.removeItem('lkpd_data');
+                document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                showAlert('✅ Form direset!', 'success');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTabs();
+            loadAutoSave();
+            updateProgress();
+
+            document.addEventListener('input', () => {
+                autoSave();
+                updateProgress();
+            });
+        });
+
+        setInterval(autoSave, 30000);
+    </script>
+</body>
+</html>

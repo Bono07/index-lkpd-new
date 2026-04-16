@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kegiatan 2: Konfrontasi Visual-Dinamis - Rotasi 180°</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1000px;
+            width: 100%;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .canvas-container {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            padding: 10px;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-play {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-play:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-play:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .toggle-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .toggle-btn.active {
+            background: #764ba2;
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .info-section {
+            background: #f5f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .info-table th, .info-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .info-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .info-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+        }
+
+        .original { background: #667eea; }
+        .bayangan { background: #764ba2; }
+        .trace { background: #ffc107; }
+
+        .angle-display {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Kegiatan 2: Konfrontasi Visual-Dinamis</h1>
+            <p>Rotasi 180° Terhadap Titik Pusat O</p>
+        </div>
+
+        <div class="content">
+            <!-- Canvas Section -->
+            <div class="canvas-section">
+                <div class="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+                <div class="angle-display">Sudut Rotasi: <span id="angleDisplay">0°</span></div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <button class="btn-play" id="playBtn" onclick="toggleAnimation()">
+                            ▶ Mulai Animasi
+                        </button>
+                        <button class="btn-play" onclick="resetAnimation()" style="background: #ff6b6b;">
+                            ↻ Reset
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <button class="toggle-btn active" id="originalToggle" onclick="toggleOriginal()">
+                            ✓ Bangun Asli
+                        </button>
+                        <button class="toggle-btn active" id="bayanganToggle" onclick="toggleBayangan()">
+                            ✓ Bayangan
+                        </button>
+                        <button class="toggle-btn" id="traceToggle" onclick="toggleTrace()">
+                            ✗ Trace
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <h3>📊 Koordinat Bangun & Bayangan</h3>
+                <table class="info-table">
+                    <thead>
+                        <tr>
+                            <th>Titik</th>
+                            <th>Asli</th>
+                            <th>Bayangan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coordinateTable">
+                        <tr>
+                            <td>A</td>
+                            <td id="coordA1">(-3, 2)</td>
+                            <td id="coordA2">(3, -2)</td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td id="coordB1">(1, 3)</td>
+                            <td id="coordB2">(-1, -3)</td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td id="coordC1">(2, -1)</td>
+                            <td id="coordC2">(-2, 1)</td>
+                        </tr>
+                        <tr>
+                            <td>D</td>
+                            <td id="coordD1">(-2, -2)</td>
+                            <td id="coordD2">(2, 2)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="legend">
+                    <strong style="color: #333; margin-bottom: 5px;">🎨 Keterangan Warna:</strong>
+                    <div class="legend-item">
+                        <div class="legend-color original"></div>
+                        <span>Bangun Asli (Biru)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color bayangan"></div>
+                        <span>Bayangan (Ungu)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color trace"></div>
+                        <span>Jejak Rotasi (Kuning)</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #ffc107;">
+                    <p style="font-size: 12px; color: #666;">
+                        <strong>💡 Pengamatan:</strong><br>
+                        Perhatikan hubungan antara bangun asli dan bayangan. Apakah bentuk dan ukurannya berubah? Apa hubungan posisinya dengan titik O?
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 20;
+            canvas.height = 400;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Original vertices
+        const originalVertices = [
+            {x: -3, y: 2, label: 'A'},
+            {x: 1, y: 3, label: 'B'},
+            {x: 2, y: -1, label: 'C'},
+            {x: -2, y: -2, label: 'D'}
+        ];
+
+        // State
+        let animationAngle = 0;
+        let isAnimating = false;
+        let showOriginal = true;
+        let showBayangan = true;
+        let showTrace = false;
+        let tracePoints = [];
+
+        // Conversion functions (world to canvas coordinates)
+        function worldToCanvas(x, y) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 40; // pixels per unit
+            return {
+                x: centerX + x * scale,
+                y: centerY - y * scale
+            };
+        }
+
+        // Rotate point around origin
+        function rotatePoint(point, angle) {
+            const rad = angle * Math.PI / 180;
+            return {
+                x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
+                y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+            };
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 40;
+
+            // Vertical lines
+            for (let i = -8; i <= 8; i++) {
+                const x = centerX + i * scale;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Horizontal lines
+            for (let i = -5; i <= 5; i++) {
+                const y = centerY + i * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+        }
+
+        // Draw origin point
+        function drawOrigin() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Draw circle
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw label
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('O', centerX + 10, centerY - 5);
+        }
+
+        // Draw polygon
+        function drawPolygon(vertices, color, isBayangan = false) {
+            if (vertices.length === 0) return;
+
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.7;
+
+            ctx.beginPath();
+            const firstPoint = worldToCanvas(vertices[0].x, vertices[0].y);
+            ctx.moveTo(firstPoint.x, firstPoint.y);
+
+            for (let i = 1; i < vertices.length; i++) {
+                const point = worldToCanvas(vertices[i].x, vertices[i].y);
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.globalAlpha = 1;
+
+            // Draw vertices and labels
+            vertices.forEach((v, idx) => {
+                const point = worldToCanvas(v.x, v.y);
+                
+                // Draw vertex point
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw label
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                const suffix = isBayangan ? "'" : "";
+                ctx.fillText(v.label + suffix, point.x, point.y + 12);
+            });
+        }
+
+        // Draw trace
+        function drawTrace() {
+            if (tracePoints.length < 2) return;
+
+            ctx.strokeStyle = '#ffc107';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.5;
+
+            ctx.beginPath();
+            const firstPoint = worldToCanvas(tracePoints[0].x, tracePoints[0].y);
+            ctx.moveTo(firstPoint.x, firstPoint.y);
+
+            for (let i = 1; i < tracePoints.length; i++) {
+                const point = worldToCanvas(tracePoints[i].x, tracePoints[i].y);
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.stroke();
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Update coordinate table
+        function updateCoordinates(angle) {
+            const bayangan = originalVertices.map(v => rotatePoint(v, angle));
+
+            originalVertices.forEach((v, idx) => {
+                const label = v.label;
+                document.getElementById(`coord${label}1`).textContent = 
+                    `(${v.x.toFixed(1)}, ${v.y.toFixed(1)})`;
+                document.getElementById(`coord${label}2`).textContent = 
+                    `(${bayangan[idx].x.toFixed(1)}, ${bayangan[idx].y.toFixed(1)})`;
+            });
+        }
+
+        // Main draw function
+        function draw() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawGrid();
+            drawOrigin();
+
+            // Get rotated vertices
+            const rotatedVertices = originalVertices.map((v, idx) => ({
+                ...rotatePoint(v, animationAngle),
+                label: v.label
+            }));
+
+            // Draw original
+            if (showOriginal) {
+                drawPolygon(originalVertices, '#667eea', false);
+            }
+
+            // Draw bayangan
+            if (showBayangan) {
+                drawPolygon(rotatedVertices, '#764ba2', true);
+            }
+
+            // Draw trace
+            if (showTrace && animationAngle > 0) {
+                // Add current vertex position to trace
+                if (animationAngle % 5 === 0) {
+                    tracePoints.push({...rotatedVertices[0]});
+                }
+                drawTrace();
+            }
+
+            // Update angle display
+            document.getElementById('angleDisplay').textContent = animationAngle.toFixed(1) + '°';
+
+            // Update coordinates
+            updateCoordinates(animationAngle);
+        }
+
+        // Animation loop
+        function animate() {
+            if (isAnimating) {
+                animationAngle += 2;
+                if (animationAngle >= 360) {
+                    animationAngle = 0;
+                    tracePoints = [];
+                }
+            }
+
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        // Control functions
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            const btn = document.getElementById('playBtn');
+            if (isAnimating) {
+                btn.textContent = '⏸ Jeda Animasi';
+            } else {
+                btn.textContent = '▶ Mulai Animasi';
+            }
+        }
+
+        function resetAnimation() {
+            isAnimating = false;
+            animationAngle = 0;
+            tracePoints = [];
+            document.getElementById('playBtn').textContent = '▶ Mulai Animasi';
+            draw();
+        }
+
+        function toggleOriginal() {
+            showOriginal = !showOriginal;
+            document.getElementById('originalToggle').classList.toggle('active');
+            draw();
+        }
+
+        function toggleBayangan() {
+            showBayangan = !showBayangan;
+            document.getElementById('bayanganToggle').classList.toggle('active');
+            draw();
+        }
+
+        function toggleTrace() {
+            showTrace = !showTrace;
+            document.getElementById('traceToggle').classList.toggle('active');
+            if (!showTrace) {
+                tracePoints = [];
+            }
+            draw();
+        }
+
+        // Initial draw
+        animate();
+    </script>
+</body>
+</html>

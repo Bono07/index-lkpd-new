@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kegiatan 4: Eksplorasi Konsep Rotasi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            color: #666;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .canvas-container {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+            padding: 10px;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .slider-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .angle-display {
+            min-width: 60px;
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-play {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-play:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-play:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .toggle-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .toggle-btn.active {
+            background: #764ba2;
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .info-section {
+            background: #f5f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .measurement-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+
+        .measurement-item strong {
+            color: #667eea;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+        }
+
+        .original { background: #667eea; }
+        .bayangan { background: #764ba2; }
+        .trace { background: #ffc107; }
+
+        .observation-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #ffc107;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Kegiatan 4: Eksplorasi Konsep Rotasi</h1>
+            <p>Mengidentifikasi Sifat-sifat yang Tetap pada Berbagai Bangun Datar</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="tabs">
+            <button class="tab-btn active" onclick="switchShape(0)">📐 Segitiga</button>
+            <button class="tab-btn" onclick="switchShape(1)">▭ Persegi Panjang</button>
+            <button class="tab-btn" onclick="switchShape(2)">▬ Trapesium</button>
+            <button class="tab-btn" onclick="switchShape(3)">🪁 Layang-layang</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Canvas Section -->
+            <div class="canvas-section">
+                <div class="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <div class="controls">
+                    <!-- Slider -->
+                    <div class="slider-group">
+                        <label>🎚️ Sudut Rotasi: <span id="angleDisplay">0°</span></label>
+                        <div class="slider-container">
+                            <input type="range" id="angleSlider" min="0" max="360" value="0" 
+                                   oninput="updateAngle(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="control-group">
+                        <button class="btn-play" id="playBtn" onclick="toggleAnimation()">
+                            ▶ Animasi Otomatis
+                        </button>
+                        <button class="btn-play" onclick="resetAnimation()" style="background: #ff6b6b;">
+                            ↻ Reset
+                        </button>
+                    </div>
+
+                    <div class="control-group">
+                        <button class="toggle-btn active" id="originalToggle" onclick="toggleOriginal()">
+                            ✓ Asli
+                        </button>
+                        <button class="toggle-btn active" id="bayanganToggle" onclick="toggleBayangan()">
+                            ✓ Bayangan
+                        </button>
+                        <button class="toggle-btn" id="traceToggle" onclick="toggleTrace()">
+                            ✗ Trace
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <h3>📊 Pengamatan Sifat-sifat Bangun</h3>
+
+                <div class="measurement-grid" id="measurements">
+                    <div class="measurement-item">
+                        <strong>Bentuk:</strong>
+                        <div id="shape">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Ukuran:</strong>
+                        <div id="size">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Panjang Sisi:</strong>
+                        <div id="sideLength">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Besar Sudut:</strong>
+                        <div id="angle">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Luas:</strong>
+                        <div id="area">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Keliling:</strong>
+                        <div id="perimeter">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Jarak ke O (titik A):</strong>
+                        <div id="distance">Tetap</div>
+                    </div>
+                    <div class="measurement-item">
+                        <strong>Orientasi:</strong>
+                        <div id="orientation">Berputar</div>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <strong style="color: #333; margin-bottom: 5px;">🎨 Keterangan:</strong>
+                    <div class="legend-item">
+                        <div class="legend-color original"></div>
+                        <span>Bangun Asli (Biru)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color bayangan"></div>
+                        <span>Bayangan Rotasi (Ungu)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color trace"></div>
+                        <span>Jejak Titik Sudut (Kuning)</span>
+                    </div>
+                </div>
+
+                <div class="observation-box">
+                    <strong>💡 Catatan Pengamatan:</strong><br>
+                    Amati dengan seksama setiap sifat bangun. Gunakan slider untuk mengubah sudut rotasi dari 0° hingga 360°. Perhatikan bagian mana yang tetap dan bagian mana yang berubah. Lihat jejak yang dihasilkan oleh titik sudut saat dirotasi!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Define shapes with standard coordinates
+        const shapes = {
+            triangle: {
+                name: 'Segitiga',
+                vertices: [
+                    {x: -2, y: -1.5, label: 'A'},
+                    {x: 2, y: -1.5, label: 'B'},
+                    {x: 0, y: 2, label: 'C'}
+                ]
+            },
+            rectangle: {
+                name: 'Persegi Panjang',
+                vertices: [
+                    {x: -2, y: -1, label: 'A'},
+                    {x: 2, y: -1, label: 'B'},
+                    {x: 2, y: 1, label: 'C'},
+                    {x: -2, y: 1, label: 'D'}
+                ]
+            },
+            trapezium: {
+                name: 'Trapesium',
+                vertices: [
+                    {x: -2.5, y: -1, label: 'A'},
+                    {x: 2.5, y: -1, label: 'B'},
+                    {x: 1.5, y: 1.5, label: 'C'},
+                    {x: -1.5, y: 1.5, label: 'D'}
+                ]
+            },
+            kite: {
+                name: 'Layang-layang',
+                vertices: [
+                    {x: 0, y: 2.5, label: 'A'},
+                    {x: 2, y: 0, label: 'B'},
+                    {x: 0, y: -1.5, label: 'C'},
+                    {x: -2, y: 0, label: 'D'}
+                ]
+            }
+        };
+
+        // State
+        let currentShapeIndex = 0;
+        let animationAngle = 0;
+        let isAnimating = false;
+        let showOriginal = true;
+        let showBayangan = true;
+        let showTrace = false;
+        let tracePoints = [];
+
+        // Resize canvas
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 20;
+            canvas.height = 400;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Convert world coordinates to canvas
+        function worldToCanvas(x, y) {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 50;
+            return {
+                x: centerX + x * scale,
+                y: centerY - y * scale
+            };
+        }
+
+        // Rotate point
+        function rotatePoint(point, angle) {
+            const rad = angle * Math.PI / 180;
+            return {
+                x: point.x * Math.cos(rad) - point.y * Math.sin(rad),
+                y: point.x * Math.sin(rad) + point.y * Math.cos(rad)
+            };
+        }
+
+        // Calculate distance
+        function distance(p1, p2) {
+            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+        }
+
+        // Calculate polygon area (Shoelace formula)
+        function polygonArea(vertices) {
+            let area = 0;
+            for (let i = 0; i < vertices.length; i++) {
+                const j = (i + 1) % vertices.length;
+                area += vertices[i].x * vertices[j].y;
+                area -= vertices[j].x * vertices[i].y;
+            }
+            return Math.abs(area) / 2;
+        }
+
+        // Calculate perimeter
+        function polygonPerimeter(vertices) {
+            let perimeter = 0;
+            for (let i = 0; i < vertices.length; i++) {
+                const j = (i + 1) % vertices.length;
+                perimeter += distance(vertices[i], vertices[j]);
+            }
+            return perimeter;
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 50;
+
+            for (let i = -8; i <= 8; i++) {
+                const x = centerX + i * scale;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            for (let i = -5; i <= 5; i++) {
+                const y = centerY + i * scale;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+        }
+
+        // Draw origin
+        function drawOrigin() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('O', centerX + 10, centerY - 5);
+        }
+
+        // Draw polygon
+        function drawPolygon(vertices, color, isBayangan = false) {
+            if (vertices.length === 0) return;
+
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.7;
+
+            ctx.beginPath();
+            const firstPoint = worldToCanvas(vertices[0].x, vertices[0].y);
+            ctx.moveTo(firstPoint.x, firstPoint.y);
+
+            for (let i = 1; i < vertices.length; i++) {
+                const point = worldToCanvas(vertices[i].x, vertices[i].y);
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.globalAlpha = 1;
+
+            vertices.forEach((v) => {
+                const point = worldToCanvas(v.x, v.y);
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                const suffix = isBayangan ? "'" : "";
+                ctx.fillText(v.label + suffix, point.x, point.y + 12);
+            });
+        }
+
+        // Draw trace
+        function drawTrace() {
+            if (tracePoints.length < 2) return;
+
+            ctx.strokeStyle = '#ffc107';
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.6;
+
+            ctx.beginPath();
+            const firstPoint = worldToCanvas(tracePoints[0].x, tracePoints[0].y);
+            ctx.moveTo(firstPoint.x, firstPoint.y);
+
+            for (let i = 1; i < tracePoints.length; i++) {
+                const point = worldToCanvas(tracePoints[i].x, tracePoints[i].y);
+                ctx.lineTo(point.x, point.y);
+            }
+            ctx.stroke();
+
+            // Draw points
+            ctx.fillStyle = '#ffc107';
+            ctx.globalAlpha = 1;
+            tracePoints.forEach((p, idx) => {
+                if (idx % 4 === 0) {
+                    const point = worldToCanvas(p.x, p.y);
+                    ctx.beginPath();
+                    ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            });
+
+            ctx.globalAlpha = 1;
+        }
+
+        // Update measurements
+        function updateMeasurements(angle) {
+            const shape = Object.values(shapes)[currentShapeIndex];
+            const rotated = shape.vertices.map(v => rotatePoint(v, angle));
+
+            // All measurements stay the same (shape properties are invariant)
+            document.getElementById('shape').textContent = '✓ Tetap';
+            document.getElementById('size').textContent = '✓ Tetap';
+            document.getElementById('sideLength').textContent = '✓ Tetap';
+            document.getElementById('angle').textContent = '✓ Tetap';
+            document.getElementById('area').textContent = `✓ ${polygonArea(shape.vertices).toFixed(2)} satuan²`;
+            document.getElementById('perimeter').textContent = `✓ ${polygonPerimeter(shape.vertices).toFixed(2)} satuan`;
+            
+            const distOriginal = distance(shape.vertices[0], {x: 0, y: 0});
+            const distRotated = distance(rotated[0], {x: 0, y: 0});
+            document.getElementById('distance').textContent = `✓ ${distOriginal.toFixed(2)} = ${distRotated.toFixed(2)} satuan`;
+            document.getElementById('orientation').textContent = `↻ ${angle}°`;
+        }
+
+        // Main draw
+        function draw() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawGrid();
+            drawOrigin();
+
+            const shape = Object.values(shapes)[currentShapeIndex];
+            const rotated = shape.vertices.map(v => rotatePoint(v, animationAngle));
+
+            if (showOriginal) {
+                drawPolygon(shape.vertices, '#667eea', false);
+            }
+
+            if (showBayangan) {
+                drawPolygon(rotated, '#764ba2', true);
+            }
+
+            if (showTrace && animationAngle > 0) {
+                if (animationAngle % 3 === 0) {
+                    tracePoints.push({...rotated[0]});
+                }
+                drawTrace();
+            }
+
+            document.getElementById('angleDisplay').textContent = animationAngle.toFixed(1) + '°';
+            document.getElementById('angleSlider').value = animationAngle;
+            updateMeasurements(animationAngle);
+        }
+
+        // Animation loop
+        function animate() {
+            if (isAnimating) {
+                animationAngle += 1.5;
+                if (animationAngle >= 360) {
+                    animationAngle = 0;
+                    tracePoints = [];
+                }
+            }
+
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        // Control functions
+        function updateAngle(value) {
+            animationAngle = parseFloat(value);
+            isAnimating = false;
+            document.getElementById('playBtn').textContent = '▶ Animasi Otomatis';
+            draw();
+        }
+
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            const btn = document.getElementById('playBtn');
+            btn.textContent = isAnimating ? '⏸ Jeda Animasi' : '▶ Animasi Otomatis';
+        }
+
+        function resetAnimation() {
+            isAnimating = false;
+            animationAngle = 0;
+            tracePoints = [];
+            document.getElementById('playBtn').textContent = '▶ Animasi Otomatis';
+            document.getElementById('angleSlider').value = 0;
+            draw();
+        }
+
+        function toggleOriginal() {
+            showOriginal = !showOriginal;
+            document.getElementById('originalToggle').classList.toggle('active');
+            draw();
+        }
+
+        function toggleBayangan() {
+            showBayangan = !showBayangan;
+            document.getElementById('bayanganToggle').classList.toggle('active');
+            draw();
+        }
+
+        function toggleTrace() {
+            showTrace = !showTrace;
+            document.getElementById('traceToggle').classList.toggle('active');
+            if (!showTrace) {
+                tracePoints = [];
+            }
+            draw();
+        }
+
+        function switchShape(index) {
+            currentShapeIndex = index;
+            tracePoints = [];
+            resetAnimation();
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+        }
+
+        // Initial
+        animate();
+    </script>
+</body>
+</html>
